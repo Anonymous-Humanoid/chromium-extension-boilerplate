@@ -150,7 +150,7 @@ let options: webpack.Configuration = {
             ])
     },
     plugins: [
-        IS_DEV_MODE && new ReactRefreshWebpackPlugin(),
+        IS_DEV_MODE && new ReactRefreshWebpackPlugin({ overlay: false }),
         new CleanWebpackPlugin({ verbose: false }),
         new webpack.ProgressPlugin(),
         // expose and write the allowed env vars on the compiled bundle
