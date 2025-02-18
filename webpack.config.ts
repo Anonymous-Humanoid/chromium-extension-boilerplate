@@ -1,13 +1,13 @@
-import webpack from 'webpack';
-import path from 'path';
-import fileSystem from 'fs-extra';
-import { NODE_ENV, ASSET_PATH } from './utils/env';
-import CopyWebpackPlugin from 'copy-webpack-plugin';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
-import TerserPlugin from 'terser-webpack-plugin';
-import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
+import { CleanWebpackPlugin } from 'clean-webpack-plugin';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+import fileSystem from 'fs-extra';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import path from 'path';
 import ReactRefreshTypeScript from 'react-refresh-typescript';
+import TerserPlugin from 'terser-webpack-plugin';
+import webpack from 'webpack';
+import { ASSET_PATH, NODE_ENV, PORT } from './utils/env';
 
 let alias: { [key: string]: string } = {};
 
@@ -36,6 +36,10 @@ const IS_DEV_MODE = process.env.NODE_ENV !== 'production';
 let options: webpack.Configuration = {
     mode: IS_DEV_MODE ? 'development' : 'production',
     entry: {
+        // Required for hot module reloading
+        hmr: `webpack-dev-server/client?http://localhost:${PORT}`,
+        // react_hmr: 'react-hot-loader/patch',
+
         newtab: path.join(__dirname, 'src', 'pages', 'Newtab', 'index.tsx'),
         options: path.join(__dirname, 'src', 'pages', 'Options', 'index.tsx'),
         popup: path.join(__dirname, 'src', 'pages', 'Popup', 'index.tsx'),
@@ -46,15 +50,15 @@ let options: webpack.Configuration = {
             'Background',
             'index.ts'
         ),
+        devtools: path.join(__dirname, 'src', 'pages', 'Devtools', 'index.ts'),
+        panel: path.join(__dirname, 'src', 'pages', 'Panel', 'index.tsx'),
         contentScript: path.join(
             __dirname,
             'src',
             'pages',
             'Content',
             'index.ts'
-        ),
-        devtools: path.join(__dirname, 'src', 'pages', 'Devtools', 'index.ts'),
-        panel: path.join(__dirname, 'src', 'pages', 'Panel', 'index.tsx')
+        )
     },
     // @ts-expect-error TODO
     chromeExtensionBoilerplate: {
