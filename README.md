@@ -9,7 +9,8 @@
 **_This boilerplate adopts [Manifest V3](https://developer.chrome.com/docs/extensions/mv3/intro/mv3-overview/)!_**
 
 - For Manifest v2 users, check out the [MV3 Migration Guide](https://developer.chrome.com/docs/extensions/mv3/intro/mv3-migration/).
-- For V2 compatibility, the forked repo has a [manifest-v2](https://github.com/lxieyang/chrome-extension-boilerplate-react/tree/manifest-v2)
+- This project does not support Manifest v2. But, if absolutely necessary,
+  the original repository has a [manifest-v2](https://github.com/lxieyang/chrome-extension-boilerplate-react/tree/manifest-v2)
   branch they recommend using.
 
 ## Features
@@ -196,4 +197,4 @@ CallAPI({ key: KEY });
 See the [TODOs](./TODO.md)
 
 [license-image]: https://img.shields.io/npm/l/markdownlint.svg
-[license-url]: https://opensource.org/licenses/MIT
+[license-url]: ./licenses/
