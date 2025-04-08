@@ -4,7 +4,7 @@
 - ESLint
   - Add `eslint-plugin-jsx-a11y` and `eslint-plugin-import` to ESLint config
   - [`Warning: React version not specified in eslint-plugin-react settings.`](https://github.com/jsx-eslint/eslint-plugin-react#configuration)
-  - Allow Prettier to format Markdown files with the correct tab spacing of 2
+  - Allow Prettier to format Markdown and YAML files with the correct tab spacing of 2
   - Migrate Prettier config to ESLint
   - When it becomes stable, use the equivalent of the current
     `--flag unstable_config_lookup_from_file` command-line argument
