@@ -1,8 +1,41 @@
-import eslint from '@eslint/js';
-import json from '@eslint/json';
-import pluginReact from 'eslint-plugin-react';
+/* NOTES:
+- Any configurations that use a parser must specify file globs
+  to not interfere with other parsers
+*/
+
+/** @typedef {import('@typescript-eslint/utils').TSESLint.FlatConfig.Config} Config */
+
+import js from '@eslint/js';
+import stylistic from '@stylistic/eslint-plugin'; // import-only
+import jsonc from 'eslint-plugin-jsonc';
+import react from 'eslint-plugin-react';
 import tseslint from 'typescript-eslint';
-import stylistic from '@stylistic/eslint-plugin';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// MJS to CJS compatibility hack
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/**
+ * Applies the given file glob selectors to the given
+ * configurations, adding to any previously set file globs
+ * without mutating the given configurations
+ * @param {(string | string[])[]} fileGlobs
+ * @param {string[]} ignoreGlobs
+ * @param {Config[]} configs
+ * @returns {Config[]}
+ */
+function applyToFiles(fileGlobs, ignoreGlobs, configs) {
+    return configs.map((config) => {
+        const NEW_CONFIG = { ...config };
+
+        NEW_CONFIG.files = (NEW_CONFIG.files ?? []).concat(...fileGlobs);
+        NEW_CONFIG.ignores = (NEW_CONFIG.ignores ?? []).concat(...ignoreGlobs);
+
+        return NEW_CONFIG;
+    });
+}
 
 const REACT_FILE_GLOBS = ['**/*.jsx', '**/*.tsx'];
 const JS_FILE_GLOBS = [
@@ -10,27 +43,54 @@ const JS_FILE_GLOBS = [
     '**/*.cjs',
     '**/*.mjs',
     '**/*.ts',
+    '**/*.cts',
+    '**/*.mts',
     ...REACT_FILE_GLOBS
 ];
+const JSON_FILE_GLOBS = ['**/*.json'];
+const JSON_IGNORE_GLOBS = ['**/.vscode/*.json', '**/tsconfig.json'];
+const JSONC_FILE_GLOBS = ['**/*.jsonc', ...JSON_IGNORE_GLOBS];
+const JSON5_FILE_GLOBS = ['**/*.json5'];
+const ROOT_DIR = path.resolve(__dirname, '..', '..');
 
-/** @type {import('@typescript-eslint/utils').TSESLint.FlatConfig.Config} */
-const IGNORE_FILE_CONFIG = {
+/** @type {Config} */
+const PROJECT_CONFIG = {
+    languageOptions: {
+        parserOptions: {
+            projectService: {
+                defaultProject: path.resolve(ROOT_DIR, 'tsconfig.json'),
+                allowDefaultProject: [
+                    path.resolve(__dirname, __filename),
+                    path.resolve(
+                        ROOT_DIR,
+                        'config',
+                        'prettier',
+                        'prettier.config.mjs'
+                    )
+                ]
+            },
+            tsconfigRootDir: ROOT_DIR
+        }
+    }
+};
+
+/** @type {Config} */
+const GLOBAL_IGNORE_CONFIG = {
+    // 'ignores' without 'files' creates a global ignore config
     ignores: [
-        // Configuration
-        '/config/eslint/**',
-
         // Dependencies
         '**/node_modules/**',
 
         // Development
-        '/coverage/**',
+        '**/coverage/**',
         '**/test/**',
         '**/testing/**',
         '**/package-lock.json',
+        '/config/eslint/**',
 
         // Deployment
-        '/build/**',
-        '/dist/**',
+        '**/build/**',
+        '**/dist/**',
         '/zip/**',
         '**/*.min.*',
         '**/*.bundle.*',
@@ -48,6 +108,7 @@ const IGNORE_FILE_CONFIG = {
         '**/backup/**',
         '**/cache/**',
         '**/logs/**',
+        '**/*.log',
 
         // Licenses
         '**/LICENSE',
@@ -56,109 +117,220 @@ const IGNORE_FILE_CONFIG = {
     ]
 };
 
-// https://typescript-eslint.io/users/configs/
-const DEFAULT_JS_CONFIGS = tseslint.config([
-    eslint.configs.recommended,
-    stylistic.configs.recommended,
-    tseslint.configs.strictTypeChecked,
-    tseslint.configs.stylisticTypeChecked,
+/**
+ * @link https://typescript-eslint.io/users/configs/
+ * @see https://typescript-eslint.io/packages/typescript-eslint#config tseslint.config
+ */
+const DEFAULT_JS_CONFIGS = applyToFiles(
+    JS_FILE_GLOBS,
+    [],
+    tseslint.config([
+        js.configs.recommended,
+        stylistic.configs.recommended,
+        tseslint.configs.strictTypeChecked,
+        tseslint.configs.stylisticTypeChecked,
+        {
+            languageOptions: {
+                parserOptions: {
+                    projectService: true,
+                    tsconfigRootDir: ROOT_DIR
+                }
+            }
+        }
+    ])
+);
+
+/**
+ * @type {Config[]}
+ * @link https://github.com/eslint/json?tab=readme-ov-file#recommended-configuration
+ */
+const JSON_CONFIGS = [
     {
         languageOptions: {
             parserOptions: {
-                projectService: true,
-                tsconfigRootDir: import.meta.dirname // Node.js >=20.11.0
+                extraFileExtensions: ['json', 'jsonc', 'json5']
             }
         }
-    }
-]);
-
-// https://github.com/eslint/json?tab=readme-ov-file#recommended-configuration
-const DEFAULT_JSON_CONFIGS = [
-    // {
-    //     ...json.configs.recommended,
-    //     files: ['**/*.json'],
-    //     language: 'json/json'
-    // },
-    // {
-    //     ...json.configs.recommended,
-    //     files: ['**/*.jsonc', '/.vscode/*.json'],
-    //     language: 'json/jsonc'
-    // },
+    },
+    ...applyToFiles(
+        [...JSON_FILE_GLOBS, ...JSONC_FILE_GLOBS, ...JSON5_FILE_GLOBS],
+        [],
+        jsonc.configs['flat/base']
+    ),
+    ...applyToFiles(
+        JSON_FILE_GLOBS,
+        JSON_IGNORE_GLOBS,
+        jsonc.configs['flat/recommended-with-json']
+    ),
+    ...applyToFiles(
+        JSONC_FILE_GLOBS,
+        [],
+        jsonc.configs['flat/recommended-with-jsonc']
+    ),
+    ...applyToFiles(
+        JSON5_FILE_GLOBS,
+        [],
+        jsonc.configs['flat/recommended-with-json5']
+    ),
     {
-        ...json.configs.recommended,
-        files: ['**/*.json5'],
-        language: 'json/json5'
+        files: [...JSONC_FILE_GLOBS, ...JSON5_FILE_GLOBS],
+        rules: {
+            'jsonc/no-comments': 'off'
+        }
     }
 ];
 
-const DEFAULT_REACT_CONFIG = pluginReact.configs.flat.recommended;
+const DEFAULT_REACT_CONFIG = react.configs.flat.recommended;
 
-const JS_CONFIG = {
-    files: JS_FILE_GLOBS,
-    languageOptions: {
-        sourceType: 'script'
-    },
-    rules: {
-        // https://eslint.org/docs/latest/rules/prefer-const
-        'prefer-const': ['warn'],
-        // https://eslint.style/rules/js/no-unexpected-multiline
-        'no-unexpected-multiline': ['error'],
+/** @type {Config[]} */
+const JS_CONFIGS = [
+    ...DEFAULT_JS_CONFIGS,
+    {
+        files: JS_FILE_GLOBS,
+        rules: {
+            /* eslint */
 
-        // https://typescript-eslint.io/rules/no-require-imports
-        '@typescript-eslint/no-require-imports': ['off'],
-        // https://typescript-eslint.io/rules/prefer-includes
-        '@typescript-eslint/prefer-includes': ['warn'],
-        // https://typescript-eslint.io/rules/no-unused-vars
-        '@typescript-eslint/no-unused-vars': ['warn'],
-        // https://typescript-eslint.io/rules/no-empty-object-type
-        '@typescript-eslint/no-empty-object-type': [
-            'error',
-            {
-                allowInterfaces: 'with-single-extends',
-                allowWithName: '^props$'
-            }
-        ],
-
-        // https://eslint.style/rules/js/indent
-        '@stylistic/indent': ['off'],
-        // https://eslint.style/rules/js/semi
-        '@stylistic/semi': [
-            'warn',
-            'always',
-            {
-                omitLastInOneLineBlock: true,
-                omitLastInOneLineClassBody: true
-            }
-        ],
-        // https://eslint.style/rules/js/no-extra-semi
-        '@stylistic/no-extra-semi': ['warn'],
-        // https://eslint.style/rules/js/comma-dangle
-        '@stylistic/comma-dangle': ['off'],
-        // https://eslint.style/rules/js/arrow-parens
-        '@stylistic/arrow-parens': ['warn', 'as-needed'],
-        // https://eslint.style/rules/js/member-delimiter-style
-        '@stylistic/member-delimiter-style': [
-            'error',
-            {
-                singleline: {
-                    delimiter: 'semi',
-                    requireLast: true
-                },
-                multiline: {
-                    delimiter: 'semi',
-                    requireLast: true
+            // https://eslint.style/rules/js/max-len
+            'max-len': [
+                'warn',
+                {
+                    code: 80,
+                    ignoreComments: true
                 }
-            }
-        ],
-        // https://eslint.style/rules/js/jsx-quotes
-        '@stylistic/jsx-quotes': ['warn', 'prefer-single'],
-        // https://eslint.style/rules/jsx/jsx-indent-props
-        '@stylistic/jsx-indent-props': ['off'],
-        // https://eslint.style/rules/jsx/jsx-one-expression-per-line
-        '@stylistic/jsx-one-expression-per-line': ['off']
-    }
-};
+            ],
+            // https://eslint.style/rules/js/no-unexpected-multiline
+            'no-unexpected-multiline': ['error'],
+            // https://eslint.org/docs/latest/rules/prefer-const
+            'prefer-const': ['warn'],
 
+            /* @typescript-eslint */
+
+            // https://typescript-eslint.io/rules/no-empty-object-type
+            '@typescript-eslint/no-empty-object-type': [
+                'error',
+                {
+                    allowInterfaces: 'with-single-extends',
+                    allowWithName: '^props$'
+                }
+            ],
+            // https://typescript-eslint.io/rules/no-require-imports
+            '@typescript-eslint/no-require-imports': ['off'],
+            // https://typescript-eslint.io/rules/no-unused-vars
+            '@typescript-eslint/no-unused-vars': ['warn'],
+            // https://typescript-eslint.io/rules/prefer-includes
+            '@typescript-eslint/prefer-includes': ['warn'],
+            // https://typescript-eslint.io/rules/restrict-template-expressions
+            '@typescript-eslint/restrict-template-expressions': [
+                'warn',
+                {
+                    allow: [
+                        {
+                            name: ['Error', 'URL', 'URLSearchParams'],
+                            from: 'lib'
+                        }
+                    ],
+                    allowAny: true,
+                    allowBoolean: true,
+                    allowNullish: true,
+                    allowNumber: true,
+                    allowRegExp: true
+                }
+            ],
+
+            /* @stylistic */
+
+            // https://eslint.style/rules/js/arrow-parens
+            '@stylistic/arrow-parens': ['warn', 'always'],
+            // https://eslint.style/rules/js/comma-dangle
+            '@stylistic/comma-dangle': ['off'],
+            // https://eslint.style/rules/js/eol-last
+            '@stylistic/eol-last': ['off'],
+            // https://eslint.style/rules/js/indent
+            '@stylistic/indent': ['off'],
+            // https://eslint.style/rules/js/jsx-quotes
+            '@stylistic/jsx-quotes': ['warn', 'prefer-single'],
+            // https://eslint.style/rules/js/member-delimiter-style
+            '@stylistic/member-delimiter-style': [
+                'warn',
+                {
+                    singleline: {
+                        delimiter: 'semi',
+                        requireLast: true
+                    },
+                    multiline: {
+                        delimiter: 'semi',
+                        requireLast: true
+                    },
+                    overrides: {
+                        typeLiteral: {
+                            singleline: {
+                                delimiter: 'semi',
+                                requireLast: false
+                            }
+                        }
+                    }
+                }
+            ],
+            // https://eslint.style/rules/js/no-extra-semi
+            '@stylistic/no-extra-semi': ['warn'],
+            // https://eslint.style/rules/js/operator-linebreak
+            '@stylistic/operator-linebreak': [
+                'warn',
+                'before',
+                {
+                    overrides: {
+                        '=': 'none',
+                        '+=': 'none',
+                        '-=': 'none',
+                        '*=': 'none',
+                        '/=': 'none',
+                        '%=': 'none',
+                        '>>=': 'none',
+                        '<<=': 'none',
+                        '>>>=': 'none',
+                        '<<<=': 'none'
+                    }
+                }
+            ],
+            // https://eslint.style/rules/js/quotes
+            '@stylistic/quotes': [
+                'warn',
+                'single',
+                {
+                    avoidEscape: true,
+                    allowTemplateLiterals: 'always'
+                }
+            ],
+            // https://eslint.style/rules/js/semi
+            '@stylistic/semi': [
+                'warn',
+                'always',
+                {
+                    omitLastInOneLineBlock: true,
+                    omitLastInOneLineClassBody: true
+                }
+            ]
+        }
+    }
+];
+
+/** @type {Config[]} */
+const REACT_CONFIGS = [
+    DEFAULT_REACT_CONFIG,
+    {
+        files: REACT_FILE_GLOBS,
+        rules: {
+            /* @stylistic */
+
+            // https://eslint.style/rules/jsx/jsx-indent-props
+            '@stylistic/jsx-indent-props': ['off'],
+            // https://eslint.style/rules/jsx/jsx-one-expression-per-line
+            '@stylistic/jsx-one-expression-per-line': ['off']
+        }
+    }
+];
+
+/** @type {Config} */
 const EXTENSION_CONFIG = {
     files: JS_FILE_GLOBS,
     languageOptions: {
@@ -168,12 +340,13 @@ const EXTENSION_CONFIG = {
     }
 };
 
+/** @type {Config[]} */
 const CONFIG = [
-    IGNORE_FILE_CONFIG,
-    ...DEFAULT_JS_CONFIGS,
-    ...DEFAULT_JSON_CONFIGS,
-    DEFAULT_REACT_CONFIG,
-    JS_CONFIG,
+    PROJECT_CONFIG,
+    GLOBAL_IGNORE_CONFIG,
+    ...JS_CONFIGS,
+    ...JSON_CONFIGS,
+    ...REACT_CONFIGS,
     EXTENSION_CONFIG
 ];
 

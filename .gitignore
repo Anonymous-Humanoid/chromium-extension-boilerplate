@@ -4,13 +4,13 @@
 **/node_modules
 
 # Development
-/coverage
-/test
-/testing
+**/coverage
+**/test
+**/testing
 
 # Deployment
-/build
-/dist
+**/build
+**/dist
 /zip
 **/*.min.*
 **/*.bundle.*
@@ -30,3 +30,4 @@
 **/backup
 **/cache
 **/logs
+**/*.log

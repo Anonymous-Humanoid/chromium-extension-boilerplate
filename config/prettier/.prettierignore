@@ -2,15 +2,14 @@
 **/node_modules
 
 # Development
-/coverage
-/test
-/testing
-**/package-lock.json
+**/coverage
+**/test
+**/testing
 
 # Deployment
-/build
-/dist
-/zip
+**/build
+**/dist
+**/zip
 **/*.min.*
 **/*.bundle.*
 **/*.map.js
@@ -27,8 +26,14 @@
 **/backup
 **/cache
 **/logs
+**/*.log
 
 # Licenses
 **/LICENSE
 **/LICENSE.md
 **/*.license
+
+# Currently disobeys overrides
+**/*.md
+**/*.yml
+**/*.yaml

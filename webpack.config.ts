@@ -9,16 +9,17 @@ import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 import { ASSET_PATH, NODE_ENV, PORT } from './utils/env';
 
-let alias: { [key: string]: string } = {};
+const OUT_DIR = path.resolve(__dirname, 'build');
+const ALIAS: Record<string, string> = {};
 
 // Loading env secrets
-let secretsPath = path.join(__dirname, 'secrets.' + NODE_ENV + '.js');
+const SECRETS_PATH = path.join(__dirname, 'secrets.' + NODE_ENV + '.js');
 
-if (fileSystem.existsSync(secretsPath)) {
-    alias['secrets'] = secretsPath;
+if (fileSystem.existsSync(SECRETS_PATH)) {
+    ALIAS.secrets = SECRETS_PATH;
 }
 
-let fileExtensions = [
+const FILE_EXTS = [
     'jpg',
     'jpeg',
     'png',
@@ -33,7 +34,8 @@ let fileExtensions = [
 
 const IS_DEV_MODE = process.env.NODE_ENV !== 'production';
 
-let options: webpack.Configuration = {
+// Exported config must not be mutable
+const CONFIG: webpack.Configuration = {
     mode: IS_DEV_MODE ? 'development' : 'production',
     devtool: IS_DEV_MODE ? 'cheap-module-source-map' : undefined,
     optimization: IS_DEV_MODE
@@ -71,13 +73,13 @@ let options: webpack.Configuration = {
             'index.ts'
         )
     },
-    // @ts-expect-error TODO
+    // @ts-expect-error TODO Remove invalid config used by webserver
     chromeExtensionBoilerplate: {
         notHotReload: ['background', 'contentScript', 'devtools']
     },
     output: {
         filename: '[name].bundle.js',
-        path: path.resolve(__dirname, 'build'),
+        path: OUT_DIR,
         clean: true,
         publicPath: ASSET_PATH
     },
@@ -102,7 +104,7 @@ let options: webpack.Configuration = {
                 ]
             },
             {
-                test: new RegExp('.(' + fileExtensions.join('|') + ')$'),
+                test: new RegExp('.(' + FILE_EXTS.join('|') + ')$'),
                 type: 'asset/resource',
                 exclude: /node_modules/
                 // loader: 'file-loader',
@@ -143,8 +145,10 @@ let options: webpack.Configuration = {
                         loader: require.resolve('babel-loader'),
                         options: {
                             plugins: [
-                                IS_DEV_MODE &&
-                                    require.resolve('react-refresh/babel')
+                                // prettier-ignore
+                                // (Line wrapping conflicts with ESLint)
+                                IS_DEV_MODE
+                                && require.resolve('react-refresh/babel')
                             ].filter(Boolean)
                         }
                     }
@@ -154,16 +158,14 @@ let options: webpack.Configuration = {
         ]
     },
     resolve: {
-        alias: alias,
-        extensions: fileExtensions
-            .map((extension) => '.' + extension)
-            .concat([
-                '.ts',
-                '.tsx', // TS(X) must come before JS(X)
-                '.js',
-                '.jsx',
-                '.css'
-            ])
+        alias: ALIAS,
+        extensions: FILE_EXTS.map((extension) => '.' + extension).concat([
+            '.ts',
+            '.tsx', // TS(X) must come before JS(X)
+            '.js',
+            '.jsx',
+            '.css'
+        ])
     },
     plugins: [
         IS_DEV_MODE && new ReactRefreshWebpackPlugin({ overlay: false }),
@@ -175,9 +177,9 @@ let options: webpack.Configuration = {
             patterns: [
                 {
                     from: 'src/manifest.json',
-                    to: path.join(__dirname, 'build'),
+                    to: OUT_DIR,
                     force: true,
-                    transform: function (content, _path) {
+                    transform: function (content) {
                         // TODO Description is missing
                         // generates the manifest file using the package.json informations
                         return Buffer.from(
@@ -196,7 +198,7 @@ let options: webpack.Configuration = {
             patterns: [
                 {
                     from: 'src/pages/Content/content.styles.css',
-                    to: path.join(__dirname, 'build'),
+                    to: OUT_DIR,
                     force: true
                 }
             ]
@@ -205,7 +207,7 @@ let options: webpack.Configuration = {
             patterns: [
                 {
                     from: 'src/assets/img/icon-128.png',
-                    to: path.join(__dirname, 'build'),
+                    to: OUT_DIR,
                     force: true
                 }
             ]
@@ -214,7 +216,7 @@ let options: webpack.Configuration = {
             patterns: [
                 {
                     from: 'src/assets/img/icon-64.png',
-                    to: path.join(__dirname, 'build'),
+                    to: OUT_DIR,
                     force: true
                 }
             ]
@@ -223,7 +225,7 @@ let options: webpack.Configuration = {
             patterns: [
                 {
                     from: 'src/assets/img/icon-34.png',
-                    to: path.join(__dirname, 'build'),
+                    to: OUT_DIR,
                     force: true
                 }
             ]
@@ -293,9 +295,6 @@ let options: webpack.Configuration = {
         level: 'info'
     }
 };
-
-// Exported config must not be mutable
-const CONFIG = options;
 
 // Webpack >= 2.0.0 no longer allows custom properties in configuration
 module.exports = CONFIG;

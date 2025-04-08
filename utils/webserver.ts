@@ -1,8 +1,9 @@
 import path from 'path';
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
+import { PORT } from './env';
 
-// Do this as the first thing so that any code reading it knows the right env.
+// Do this as the first thing so that any code reading it knows the right env
 process.env.BABEL_ENV = 'development';
 process.env.NODE_ENV = 'development';
 process.env.ASSET_PATH = '/';
@@ -13,24 +14,21 @@ type WebpackConfig = webpack.Configuration & {
 };
 
 // Env-dependent imports
-const config: WebpackConfig = require('../webpack.config');
-const env = require('./env');
+const config = require('../webpack.config') as WebpackConfig;
 
 // TODO Move extraneous webpack configuration
-let options = config.chromeExtensionBoilerplate || {};
-let excludeEntriesToHotReload = options.notHotReload ?? [];
+const OPTIONS = config.chromeExtensionBoilerplate ?? {};
+const EXCLUDE_ENTRIES_TO_HOT_RELOAD = OPTIONS.notHotReload ?? [];
 
 // TODO This `as` statement is awful and presumptuous
-const entry = (config.entry = (config.entry || {}) as {
-    [key: string]: string;
-});
+const entry = (config.entry = (config.entry ?? {}) as Record<string, string>);
 
-for (let entryName in entry) {
-    if (excludeEntriesToHotReload.indexOf(entryName) === -1) {
+for (const entryName in entry) {
+    if (!EXCLUDE_ENTRIES_TO_HOT_RELOAD.includes(entryName)) {
         // TODO Wait, this is already in our webpack config!
         config.entry[entryName] = [
             'webpack/hot/dev-server',
-            `webpack-dev-server/client?hot=true&hostname=localhost&port=${env.PORT}`
+            `webpack-dev-server/client?hot=true&hostname=localhost&port=${PORT}`
         ].concat(entry[entryName]);
     }
 }
@@ -38,9 +36,9 @@ for (let entryName in entry) {
 // Removing extraneous webpack config
 delete config.chromeExtensionBoilerplate;
 
-let compiler = webpack(config as webpack.Configuration);
+const COMPILER = webpack(config as webpack.Configuration);
 
-let server = new WebpackDevServer(
+const SERVER = new WebpackDevServer(
     {
         https: false,
         hot: true,
@@ -50,12 +48,12 @@ let server = new WebpackDevServer(
         },
         webSocketServer: 'sockjs',
         host: 'localhost',
-        port: env.PORT,
+        port: PORT,
         static: {
             directory: path.join(__dirname, '../build')
         },
         devMiddleware: {
-            publicPath: `http://localhost:${env.PORT}/`,
+            publicPath: `http://localhost:${PORT}/`,
             writeToDisk: true
         },
         headers: {
@@ -63,10 +61,12 @@ let server = new WebpackDevServer(
         },
         allowedHosts: 'all'
     },
-    compiler
+    COMPILER
 );
 
 // Running server
 (async () => {
-    await server.start();
-})();
+    await SERVER.start();
+})().catch((err: unknown) => {
+    console.error('Web server encountered an error:', err);
+});

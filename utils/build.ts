@@ -9,21 +9,24 @@ process.env.NODE_ENV = 'production';
 process.env.ASSET_PATH = '/';
 
 // Env-dependent imports
-const config: webpack.Configuration = require('../webpack.config');
+const CONFIG = require('../webpack.config') as webpack.Configuration;
 
-// @ts-expect-error TODO
-delete config.chromeExtensionBoilerplate;
+// @ts-expect-error TODO Remove invalid config used by webserver
+delete CONFIG.chromeExtensionBoilerplate;
 
 // Zipping extension
-let packageInfo = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
+const PACKAGE_INFO = JSON.parse(
+    fs.readFileSync('package.json', 'utf-8')
+) as object & { name: string; version: string };
 
-config.plugins = (config.plugins || []).concat(
+// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+CONFIG.plugins = [...(CONFIG.plugins || [])].concat(
     new ZipPlugin({
-        filename: `${packageInfo.name}-${packageInfo.version}.zip`,
-        path: path.join(__dirname, '../', 'zip')
+        filename: `${PACKAGE_INFO.name}-${PACKAGE_INFO.version}.zip`,
+        path: path.join(__dirname, '..', 'zip')
     })
 );
 
-webpack(config, function (err) {
+webpack(CONFIG, function (err) {
     if (err) throw err;
 });

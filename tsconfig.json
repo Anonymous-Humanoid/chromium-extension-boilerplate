@@ -6,14 +6,15 @@
             "ESNext",
 
             // Web interfaces
-            "dom",
-            "dom.iterable",
+            "DOM",
+            "DOM.Iterable",
 
-            // Asynchronocity and promises
+            // Asynchronicity and promises
             "ES2020.Promise",
             "ESNext.asynciterable"
         ],
         "allowJs": true,
+        "checkJs": true,
         "skipLibCheck": true,
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
@@ -25,11 +26,11 @@
         "resolveJsonModule": true,
         "noEmit": false,
         "jsx": "react",
-        // Fixes complaints of 'bonjour' being an implicit entry point
-        "typeRoots": ["./node_modules/@types"]
+        "typeRoots": ["./node_modules/@types"],
+        "outDir": "./build"
     },
     "include": ["**/*"],
-    "exclude": ["build", "dist", "node_modules", "zip", "config"],
+    "exclude": ["**/build", "**/dist", "**/node_modules", "./zip"],
     "ts-node": {
         "compilerOptions": {
             "module": "CommonJS"

@@ -48,10 +48,10 @@ and Webpack Dev Server 4.
 5. Run `npm install` to install the dependencies.
 6. Run `npm start`
 7. Load your extension on Chrome following:
-   1. Access `chrome://extensions/`
-   2. Check `Developer mode`
-   3. Click on `Load unpacked extension`
-   4. Select the `build` folder.
+    1. Access `chrome://extensions/`
+    2. Check `Developer mode`
+    3. Click on `Load unpacked extension`
+    4. Select the `build` folder.
 8. Happy hacking.
 
 ## Structure
@@ -107,9 +107,9 @@ To do so you need to expose which entry points are content scripts on the
 `webpack.config.ts` using the `chromeExtensionBoilerplate -> notHotReload` config.
 See the example below.
 
-Let's say that you want use the `myContentScript` entry point as content script,
-so in your `webpack.config.ts` you will configure the entry point and exclude it
-from hot reloading, like so:
+Let's say that you want use the `myContentScript` entry point as a content
+script, so in your `webpack.config.ts` you will configure the entry point and
+exclude it from hot reloading, like so:
 
 <!-- prettier-ignore -->
 ```jsonc
@@ -190,6 +190,10 @@ CallAPI({ key: KEY });
 
 - Michael Xieyang Liu | [Original repo](https://github.com/lxieyang/chrome-extension-boilerplate-react)
   | [Website](https://lxieyang.github.io)
+
+## Contribution
+
+See the [TODOs](./TODO.md)
 
 [license-image]: https://img.shields.io/npm/l/markdownlint.svg
 [license-url]: https://opensource.org/licenses/MIT
