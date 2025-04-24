@@ -1,6 +1,5 @@
 # TODOs
 
-- Migrate from React PureComponents to hooks
 - ESLint
   - Add `eslint-plugin-jsx-a11y` and `eslint-plugin-import` to ESLint config
   - [`Warning: React version not specified in eslint-plugin-react settings.`](https://github.com/jsx-eslint/eslint-plugin-react#configuration)
@@ -14,3 +13,4 @@
 - Remove unused Babel dependencies
 - Configure .hintrc
 - Add tests with Playwright for Node.js
+- Migrate from webpack and `webpack-dev-server` to Next.js

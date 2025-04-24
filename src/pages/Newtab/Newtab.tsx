@@ -3,7 +3,7 @@ import logo from '../../assets/img/logo.svg';
 import './Newtab.css';
 import './Newtab.scss';
 
-const Newtab = () => {
+const Newtab: React.FC = () => {
     return (
         <div className='App'>
             <header className='App-header'>

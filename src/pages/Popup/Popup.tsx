@@ -2,7 +2,7 @@ import React from 'react';
 import logo from '../../assets/img/logo.svg';
 import './Popup.css';
 
-export default function Popup() {
+const Popup: React.FC = () => {
     return (
         <div className='App'>
             <header className='App-header'>
@@ -22,4 +22,6 @@ export default function Popup() {
             </header>
         </div>
     );
-}
+};
+
+export default Popup;
