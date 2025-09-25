@@ -86,7 +86,7 @@ const GLOBAL_IGNORE_CONFIG = {
         '**/test/**',
         '**/testing/**',
         '**/package-lock.json',
-        '/config/eslint/**',
+        '**/eslint.*',
 
         // Deployment
         '**/build/**',

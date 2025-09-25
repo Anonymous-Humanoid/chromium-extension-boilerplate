@@ -16,7 +16,7 @@
         "prettier": "npx prettier --config \"./prettier.config.mjs\" --ignore-path \"./.prettierignore\" \"**/*.{yml,yaml,js,cjs,mjs,ts,cts,mts,jsx,tsx,md,html,css,json,jsonc,json5}\"",
         "prettier:check": "npm run prettier -- -c",
         "prettier:fix": "npm run prettier -- -w",
-        "eslint:check": "npx eslint . -c \"./config/eslint/eslint.config.mjs\"",
+        "eslint:check": "npx eslint . -c \"./eslint.config.mjs\"",
         "eslint:fix": "npm run eslint:check -- --fix",
         "tsc": "npx tsc --noEmit"
     },
