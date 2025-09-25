@@ -5,28 +5,24 @@
  */
 const CONFIG = {
     singleQuote: true,
-    trailingComma: "none",
+    trailingComma: 'none',
     requirePragma: false,
-    arrowParens: "always",
+    arrowParens: 'always',
     useTabs: false,
     tabWidth: 4,
     semi: true,
-    endOfLine: "lf",
+    endOfLine: 'lf',
     printWidth: 80,
     jsxSingleQuote: true,
     singleAttributePerLine: false,
     overrides: [
         {
-            files: [
-                "**/*.md",
-                "**/*.yml",
-                "**/*.yaml"
-            ],
+            files: ['**/*.md', '**/*.yml', '**/*.yaml'],
             options: {
                 tabWidth: 2
             }
         }
     ]
-}
+};
 
 export default CONFIG;
