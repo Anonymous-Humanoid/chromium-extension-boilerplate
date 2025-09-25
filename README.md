@@ -197,4 +197,4 @@ CallAPI({ key: KEY });
 See the [TODOs](./TODO.md)
 
 [license-image]: https://img.shields.io/npm/l/markdownlint.svg
-[license-url]: ./licenses/
+[license-url]: ./LICENSE.md
