@@ -3,8 +3,6 @@
 
 # Development
 **/coverage
-**/test
-**/testing
 
 # Deployment
 **/build
@@ -32,8 +30,3 @@
 **/LICENSE
 **/LICENSE.md
 **/*.license
-
-# Currently disobeys overrides
-**/*.md
-**/*.yml
-**/*.yaml

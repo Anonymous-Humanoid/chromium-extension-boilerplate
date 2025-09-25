@@ -1,8 +1,8 @@
 // https://github.com/DavidAnson/markdownlint-cli2?tab=readme-ov-file#markdownlint-cli2jsonc
 {
     "config": {
-        "line-length": false,
-        "no-hard-tabs": true
+        "line-length": false, // Hyperlinks can easily surpass 80 characters
+        "no-hard-tabs": true // Space indentation instead of tabs
     },
     "globs": [
         // Ignoring licenses, because they shouldn't be modified
