@@ -2,7 +2,7 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "typescript.tsdk": "./node_modules/typescript/lib",
-    "prettier.configPath": "./.prettierrc",
+    "prettier.configPath": "./prettier.config.mjs",
     "prettier.ignorePath": "./.prettierignore",
     "markdownlint.configFile": "./.markdownlint-cli2.jsonc",
     "eslint.useFlatConfig": true,

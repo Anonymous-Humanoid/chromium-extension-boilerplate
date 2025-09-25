@@ -1,0 +1,11 @@
+services:
+  nginx:
+    build:
+      image: nginx:latest
+    env:
+      - 'NODE_ENV=production'
+      - 'MONGO_URI=mongodb://localhost:27017'
+  alpine:
+    build:
+      image: alpine:latest
+    entrypoint: ['tail', '-f', '/dev/null']
