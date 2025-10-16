@@ -10,7 +10,7 @@
 
 - For Manifest v2 users, check out the [MV3 Migration Guide](https://developer.chrome.com/docs/extensions/mv3/intro/mv3-migration/).
 - This project does not support Manifest v2. But, if absolutely necessary,
-  the original repository has a [manifest-v2](https://github.com/lxieyang/chrome-extension-boilerplate-react/tree/manifest-v2)
+  the upstream repository has a [manifest-v2](https://github.com/lxieyang/chrome-extension-boilerplate-react/tree/manifest-v2)
   branch they recommend using.
 
 ## Features
@@ -104,26 +104,27 @@ on your extension manifest, to your bundles that you want to use as
 [content scripts](https://developer.chrome.com/extensions/content_scripts),
 but you need to exclude these entry points from hot reloading
 [(why?)](https://github.com/samuelsimoes/chrome-extension-webpack-boilerplate/issues/4#issuecomment-261788690).
-To do so you need to expose which entry points are content scripts on the
-`webpack.config.ts` using the `chromeExtensionBoilerplate -> notHotReload` config.
-See the example below.
+To do so you need to expose which entry points are content scripts in
+[`webpack.config.ts`](./webpack/webpack.config.ts)
+using the `options.notHotReload` config. See the example below.
 
 Let's say that you want use the `myContentScript` entry point as a content
 script, so in your `webpack.config.ts` you will configure the entry point and
 exclude it from hot reloading, like so:
 
 <!-- prettier-ignore -->
-```jsonc
-{
+```js
+const config: webpack.Config = {
     // …
-    "entry": {
-        "myContentScript": "./src/js/myContentScript.js"
+    entry: {
+        myContentScript: "./src/js/myContentScript.ts"
     },
-    "chromeExtensionBoilerplate": {
-        "notHotReload": ["myContentScript"]
-    }
     // …
-}
+};
+
+export const options = {
+    notHotReload: ["myContentScript"]
+};
 ```
 
 and in your `src/manifest.json`:
@@ -171,7 +172,7 @@ _`secrets.development.js`_
 export const KEY = '123';
 ```
 
-_`src/popup.js`_
+_`src/pages/Background/index.js`_
 
 ```js
 import { KEY } from 'secrets';

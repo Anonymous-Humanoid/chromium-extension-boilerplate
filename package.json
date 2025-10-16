@@ -1,6 +1,6 @@
 {
     "name": "chromium-extension-boilerplate",
-    "version": "1.0.0.0",
+    "version": "1.0.0",
     "description": "A Chromium extension boilerplate",
     "license": "MIT",
     "private": true,
@@ -10,15 +10,15 @@
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "npx ts-node utils/build.ts",
-        "start": "npx ts-node utils/webserver.ts",
-        "check": "npm run tsc && npm run eslint:check && npm run prettier:check",
-        "prettier": "npx prettier --config \"./prettier.config.mjs\" --ignore-path \"./.prettierignore\" \"**/*.{yml,yaml,js,cjs,mjs,ts,cts,mts,jsx,tsx,md,html,css,json,jsonc,json5}\"",
-        "prettier:check": "npm run prettier -- -c",
-        "prettier:fix": "npm run prettier -- -w",
-        "eslint:check": "npx eslint . -c \"./eslint.config.mjs\"",
-        "eslint:fix": "npm run eslint:check -- --fix",
-        "tsc": "npx tsc --noEmit"
+        "build": "ts-node -T webpack/build.ts",
+        "start": "ts-node -T webpack/webserver.ts",
+        "check": "npm-run-all -cs tsc eslint:check prettier:check",
+        "prettier": "prettier --config ./prettier.config.mjs --ignore-path ./.prettierignore **/*.{yml,yaml,js,cjs,mjs,ts,cts,mts,jsx,tsx,md,html,css,json,jsonc,json5}",
+        "prettier:check": "node --run=prettier -- -c",
+        "prettier:fix": "node --run=prettier -- -w",
+        "eslint:check": "eslint -c ./eslint.config.mjs .",
+        "eslint:fix": "node --run=eslint:check -- --fix",
+        "tsc": "tsc"
     },
     "dependencies": {
         "react": "^19.0.0",
@@ -53,6 +53,7 @@
         "globals": "^16.0.0",
         "html-loader": "^4.2.0",
         "html-webpack-plugin": "^5.5.0",
+        "npm-run-all": "^4.1.5",
         "prettier": "^3.5.3",
         "react-refresh": "^0.14.0",
         "react-refresh-typescript": "^2.0.10",
@@ -64,10 +65,11 @@
         "ts-loader": "^9.4.2",
         "ts-node": "^10.9.2",
         "type-fest": "^3.5.2",
-        "typescript-eslint": "^8.28.0",
+        "typescript": "^5.9.3",
+        "typescript-eslint": "^8.46.1",
         "webpack": "^5.75.0",
         "webpack-cli": "^4.10.0",
-        "webpack-dev-server": "^4.11.1",
+        "webpack-dev-server": "^5.2.2",
         "zip-webpack-plugin": "^4.0.1"
     }
 }

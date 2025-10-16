@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "ES5",
+        "target": "es2020",
         "lib": [
             // General JS
             "ESNext",
@@ -21,19 +21,13 @@
         "strict": true,
         "forceConsistentCasingInFileNames": true,
         "noFallthroughCasesInSwitch": true,
-        "module": "ESNext",
+        "module": "es2022",
         "moduleResolution": "node",
         "resolveJsonModule": true,
-        "noEmit": false,
+        "noEmit": true,
         "jsx": "react",
-        "typeRoots": ["./node_modules/@types"],
-        "outDir": "./build"
+        "typeRoots": ["./node_modules/@types"]
     },
     "include": ["**/*"],
-    "exclude": ["**/build", "**/dist", "**/node_modules", "./zip"],
-    "ts-node": {
-        "compilerOptions": {
-            "module": "CommonJS"
-        }
-    }
+    "exclude": ["**/build", "**/dist", "**/node_modules", "./zip"]
 }

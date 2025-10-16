@@ -3,11 +3,11 @@ import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import fileSystem from 'fs-extra';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import path from 'path';
+import path from 'node:path';
 import ReactRefreshTypeScript from 'react-refresh-typescript';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
-import { ASSET_PATH, NODE_ENV, PORT } from './utils/env';
+import { NODE_ENV } from './env';
 
 const OUT_DIR = path.resolve(__dirname, 'build');
 const ALIAS: Record<string, string> = {};
@@ -35,7 +35,7 @@ const FILE_EXTS = [
 const IS_DEV_MODE = process.env.NODE_ENV !== 'production';
 
 // Exported config must not be mutable
-const CONFIG: webpack.Configuration = {
+const config: webpack.Configuration = {
     mode: IS_DEV_MODE ? 'development' : 'production',
     devtool: IS_DEV_MODE ? 'cheap-module-source-map' : undefined,
     optimization: IS_DEV_MODE
@@ -49,10 +49,6 @@ const CONFIG: webpack.Configuration = {
               ]
           },
     entry: {
-        // Required for hot module reloading
-        hmr: `webpack-dev-server/client?http://localhost:${PORT}`,
-        // react_hmr: 'react-hot-loader/patch',
-
         newtab: path.join(__dirname, 'src', 'pages', 'Newtab', 'index.tsx'),
         options: path.join(__dirname, 'src', 'pages', 'Options', 'index.tsx'),
         popup: path.join(__dirname, 'src', 'pages', 'Popup', 'index.tsx'),
@@ -73,15 +69,11 @@ const CONFIG: webpack.Configuration = {
             'index.ts'
         )
     },
-    // @ts-expect-error TODO Remove invalid config used by webserver
-    chromeExtensionBoilerplate: {
-        notHotReload: ['background', 'contentScript', 'devtools']
-    },
     output: {
         filename: '[name].bundle.js',
         path: OUT_DIR,
         clean: true,
-        publicPath: ASSET_PATH
+        publicPath: '/'
     },
     module: {
         rules: [
@@ -181,7 +173,7 @@ const CONFIG: webpack.Configuration = {
                     force: true,
                     transform: function (content) {
                         // TODO Description is missing
-                        // generates the manifest file using the package.json informations
+                        // generates the manifest file using the package.json information
                         return Buffer.from(
                             JSON.stringify({
                                 ...JSON.parse(content.toString()),
@@ -296,5 +288,8 @@ const CONFIG: webpack.Configuration = {
     }
 };
 
-// Webpack >= 2.0.0 no longer allows custom properties in configuration
-module.exports = CONFIG;
+export const options = {
+    notHotReload: ['background', 'contentScript', 'devtools']
+};
+
+export default config;
