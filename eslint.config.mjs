@@ -180,7 +180,14 @@ const JSON_CONFIGS = [
     }
 ];
 
-const DEFAULT_REACT_CONFIG = react.configs.flat.recommended;
+const DEFAULT_REACT_CONFIG = {
+    ...react.configs.flat.recommended,
+    settings: {
+        react: {
+            version: 'detect'
+        }
+    }
+};
 
 /** @type {Config[]} */
 const JS_CONFIGS = [

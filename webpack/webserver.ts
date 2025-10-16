@@ -65,10 +65,8 @@ const server = new WebpackDevServer(
 );
 
 // Running server
-(async () => {
-    try {
-        await server.start();
-    } catch (err: unknown) {
-        console.error('Web server encountered an error:', err);
-    }
-})();
+try {
+    await server.start();
+} catch (err: unknown) {
+    console.error('Web server encountered an error:', err);
+}
