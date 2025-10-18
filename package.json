@@ -12,14 +12,17 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "tsx ./webpack/build.ts",
-        "start": "tsx ./webpack/webserver.ts",
+        "start": "node --run=create-certs && tsx ./webpack/webserver.ts",
         "check": "npm-run-all -cs tsc eslint:check prettier:check",
         "prettier": "prettier --config ./prettier.config.mjs --ignore-path ./.prettierignore **/*.{yml,yaml,js,cjs,mjs,ts,cts,mts,jsx,tsx,md,html,css,json,jsonc,json5}",
         "prettier:check": "node --run=prettier -- -c",
         "prettier:fix": "node --run=prettier -- -w",
         "eslint:check": "eslint -c ./eslint.config.mjs .",
         "eslint:fix": "node --run=eslint:check -- --fix",
-        "tsc": "tsc"
+        "tsc": "tsc",
+        "create-certs": "node --run=create-ca && node --run=create-cert",
+        "create-ca": "mkcert create-ca --key ./secrets/ca/ca.key --cert ./secrets/ca/ca.crt --validity 1",
+        "create-cert": "mkcert create-cert --ca-key ./secrets/ca/ca.key --ca-cert ./secrets/ca/ca.crt --key ./secrets/cert/cert.key --cert ./secrets/cert/cert.crt --validity 1 --domains [\"localhost\",\"127.0.0.1\",\"[::1]\"]"
     },
     "dependencies": {
         "react": "^19.0.0",
@@ -30,6 +33,7 @@
         "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
         "@stylistic/eslint-plugin": "^4.2.0",
         "@types/chrome": "^0.0.316",
+        "@types/express": "^4.17.23",
         "@types/fs-extra": "^11.0.4",
         "@types/react": "^19.0.10",
         "@types/react-dom": "^19.0.4",
@@ -49,6 +53,7 @@
         "globals": "^16.0.0",
         "html-loader": "^4.2.0",
         "html-webpack-plugin": "^5.5.0",
+        "mkcert": "^3.2.0",
         "npm-run-all": "^4.1.5",
         "prettier": "^3.5.3",
         "react-refresh": "^0.14.0",

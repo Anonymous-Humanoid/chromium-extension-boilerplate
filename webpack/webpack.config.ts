@@ -48,9 +48,6 @@ for (const ext of secretResolutionOrder) {
 
 // Exported config must not be mutable
 const config: webpack.Configuration = {
-    // experiments: {
-    //     topLevelAwait: true
-    // },
     mode: IS_DEV_MODE ? 'development' : 'production',
     devtool: IS_DEV_MODE ? 'cheap-module-source-map' : undefined,
     optimization: IS_DEV_MODE

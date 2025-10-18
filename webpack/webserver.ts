@@ -1,3 +1,5 @@
+import { Application } from 'express';
+import { Server } from 'node:tls';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import webpack from 'webpack';
@@ -14,6 +16,7 @@ process.env.NODE_ENV = 'development';
 import { PORT } from './env';
 import config, { options } from './webpack.config';
 
+const PROJECT_ROOT = path.join(__dirname, '..');
 const notHotEntrypoints = options.notHotReload;
 const hotDependencies = [
     'webpack/hot/dev-server',
@@ -43,18 +46,14 @@ for (const entryName in config.entry) {
 }
 
 const compiler = webpack(config);
-const server = new WebpackDevServer(
+const server = new WebpackDevServer<Application, Server>(
     {
         hot: true,
         liveReload: false,
-        client: {
-            webSocketTransport: 'sockjs'
-        },
-        webSocketServer: 'sockjs',
         host: 'localhost',
         port: PORT,
         static: {
-            directory: path.join(__dirname, '../build')
+            directory: path.join(PROJECT_ROOT, 'build')
         },
         devMiddleware: {
             publicPath: `http://localhost:${PORT}/`,

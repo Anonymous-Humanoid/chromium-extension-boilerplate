@@ -14,6 +14,8 @@ process.env.NODE_ENV = 'production';
 // Env-dependent imports
 import config from './webpack.config';
 
+const PROJECT_ROOT = path.join(__dirname, '..');
+
 // Zipping extension
 const PACKAGE_INFO = JSON.parse(
     fs.readFileSync('package.json', 'utf-8')
@@ -23,7 +25,7 @@ const PACKAGE_INFO = JSON.parse(
 config.plugins = [...(config.plugins || [])].concat(
     new ZipPlugin({
         filename: `${PACKAGE_INFO.name}-${PACKAGE_INFO.version}.zip`,
-        path: path.join(__dirname, '..', 'zip')
+        path: path.join(PROJECT_ROOT, 'zip')
     })
 );
 

@@ -22,7 +22,9 @@
 **/*.env.*
 **/.history
 **/secrets.*
-**/secrets
+**/secrets/**
+**/*.crt
+**/*.key
 
 # Temporary files
 **/tmp
