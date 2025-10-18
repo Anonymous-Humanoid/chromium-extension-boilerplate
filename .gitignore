@@ -22,6 +22,7 @@
 **/*.env.*
 **/.history
 **/secrets.*
+**/secrets
 
 # Temporary files
 **/tmp

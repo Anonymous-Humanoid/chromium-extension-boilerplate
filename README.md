@@ -1,4 +1,4 @@
-# Chrome Extension (MV3) Boilerplate with React 18 and Webpack 5
+# Chrome Extension (MV3) Boilerplate with React and Webpack
 
 ![Project icon](src/assets/img/icon-64.png)
 
@@ -22,7 +22,7 @@ and modern JavaScript code, load CSS easily and
 This boilerplate is updated with:
 
 - [Chrome Extension Manifest V3](https://developer.chrome.com/docs/extensions/mv3/intro/mv3-overview/)
-- [React 18](https://reactjs.org)
+- [React 19](https://reactjs.org)
 - [Webpack 5](https://webpack.js.org/)
 - [Webpack Dev Server 4](https://webpack.js.org/configuration/dev-server/)
 - [React Refresh](https://www.npmjs.com/package/react-refresh)
