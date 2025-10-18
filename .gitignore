@@ -21,8 +21,7 @@
 **/*.env
 **/*.env.*
 **/.history
-**/secrets.js
-**/secrets.*.js
+**/secrets.*
 
 # Temporary files
 **/tmp

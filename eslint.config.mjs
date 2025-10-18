@@ -13,7 +13,7 @@ import tseslint from 'typescript-eslint';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// MJS to CJS compatibility hack
+// MJS compatibility with CJS globals
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -220,8 +220,9 @@ const JS_CONFIGS = [
                     allowWithName: '^props$'
                 }
             ],
+            // Ignored if you use createRequire
             // https://typescript-eslint.io/rules/no-require-imports
-            '@typescript-eslint/no-require-imports': ['off'],
+            '@typescript-eslint/no-require-imports': ['error'],
             // https://typescript-eslint.io/rules/no-unused-vars
             '@typescript-eslint/no-unused-vars': ['warn'],
             // https://typescript-eslint.io/rules/prefer-includes
@@ -316,6 +317,12 @@ const JS_CONFIGS = [
                     omitLastInOneLineBlock: true,
                     omitLastInOneLineClassBody: true
                 }
+            ],
+            // https://eslint.style/rules/js/brace-style
+            '@stylistic/brace-style': [
+                'warn',
+                'stroustrup',
+                { allowSingleLine: false }
             ]
         }
     }

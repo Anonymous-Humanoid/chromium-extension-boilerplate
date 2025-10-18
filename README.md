@@ -176,12 +176,14 @@ _`src/pages/Background/index.js`_
 
 ```js
 import { KEY } from 'secrets';
-// Or: const { KEY } = require('secrets');
+// Or, equivalently:
+// const require = createRequire(import.meta.url);
+// const { KEY } = require('secrets');
 
 CallAPI({ key: KEY });
 ```
 
-:point_right: `secrets.*.js` is already included in the .gitignore file.
+:point_right: `**/secrets.*` is already included in the .gitignore file.
 
 ## Resources
 

@@ -3,22 +3,23 @@ import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import fileSystem from 'fs-extra';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import { createRequire } from 'node:module';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import ReactRefreshTypeScript from 'react-refresh-typescript';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
+import packageJson from '../package.json';
 import { NODE_ENV } from './env';
 
-const OUT_DIR = path.resolve(__dirname, 'build');
-const ALIAS: Record<string, string> = {};
+// MJS compatibility with CJS globals
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const require = createRequire(__filename);
 
-// Loading env secrets
-const SECRETS_PATH = path.join(__dirname, 'secrets.' + NODE_ENV + '.js');
-
-if (fileSystem.existsSync(SECRETS_PATH)) {
-    ALIAS.secrets = SECRETS_PATH;
-}
-
+const PROJECT_ROOT = path.join(__dirname, '..');
+const OUT_DIR = path.resolve(PROJECT_ROOT, 'build');
+const IS_DEV_MODE = NODE_ENV !== 'production';
 const FILE_EXTS = [
     'jpg',
     'jpeg',
@@ -32,10 +33,24 @@ const FILE_EXTS = [
     'woff2'
 ];
 
-const IS_DEV_MODE = process.env.NODE_ENV !== 'production';
+// Loading env secrets
+const alias: Record<string, string> = {};
+const secretResolutionOrder = ['.ts', '.mts', '.cts', '.js', '.mjs', '.cjs'];
+
+for (const ext of secretResolutionOrder) {
+    const secretsPath = path.join(PROJECT_ROOT, `secrets.${NODE_ENV}${ext}`);
+
+    if (fileSystem.existsSync(secretsPath)) {
+        alias.secrets = secretsPath;
+        break;
+    }
+}
 
 // Exported config must not be mutable
 const config: webpack.Configuration = {
+    // experiments: {
+    //     topLevelAwait: true
+    // },
     mode: IS_DEV_MODE ? 'development' : 'production',
     devtool: IS_DEV_MODE ? 'cheap-module-source-map' : undefined,
     optimization: IS_DEV_MODE
@@ -49,20 +64,32 @@ const config: webpack.Configuration = {
               ]
           },
     entry: {
-        newtab: path.join(__dirname, 'src', 'pages', 'Newtab', 'index.tsx'),
-        options: path.join(__dirname, 'src', 'pages', 'Options', 'index.tsx'),
-        popup: path.join(__dirname, 'src', 'pages', 'Popup', 'index.tsx'),
+        newtab: path.join(PROJECT_ROOT, 'src', 'pages', 'Newtab', 'index.tsx'),
+        options: path.join(
+            PROJECT_ROOT,
+            'src',
+            'pages',
+            'Options',
+            'index.tsx'
+        ),
+        popup: path.join(PROJECT_ROOT, 'src', 'pages', 'Popup', 'index.tsx'),
         background: path.join(
-            __dirname,
+            PROJECT_ROOT,
             'src',
             'pages',
             'Background',
             'index.ts'
         ),
-        devtools: path.join(__dirname, 'src', 'pages', 'Devtools', 'index.ts'),
-        panel: path.join(__dirname, 'src', 'pages', 'Panel', 'index.tsx'),
+        devtools: path.join(
+            PROJECT_ROOT,
+            'src',
+            'pages',
+            'Devtools',
+            'index.ts'
+        ),
+        panel: path.join(PROJECT_ROOT, 'src', 'pages', 'Panel', 'index.tsx'),
         contentScript: path.join(
-            __dirname,
+            PROJECT_ROOT,
             'src',
             'pages',
             'Content',
@@ -150,7 +177,7 @@ const config: webpack.Configuration = {
         ]
     },
     resolve: {
-        alias: ALIAS,
+        alias: alias,
         extensions: FILE_EXTS.map((extension) => '.' + extension).concat([
             '.ts',
             '.tsx', // TS(X) must come before JS(X)
@@ -164,7 +191,7 @@ const config: webpack.Configuration = {
         new CleanWebpackPlugin({ verbose: false }),
         new webpack.ProgressPlugin(),
         // expose and write the allowed env vars on the compiled bundle
-        new webpack.EnvironmentPlugin(['NODE_ENV']),
+        new webpack.EnvironmentPlugin({ NODE_ENV }),
         new CopyWebpackPlugin({
             patterns: [
                 {
@@ -172,14 +199,12 @@ const config: webpack.Configuration = {
                     to: OUT_DIR,
                     force: true,
                     transform: function (content) {
-                        // TODO Description is missing
                         // generates the manifest file using the package.json information
                         return Buffer.from(
                             JSON.stringify({
                                 ...JSON.parse(content.toString()),
-                                description:
-                                    process.env.npm_package_description,
-                                version: process.env.npm_package_version
+                                description: packageJson.description,
+                                version: packageJson.version
                             })
                         );
                     }
@@ -224,7 +249,7 @@ const config: webpack.Configuration = {
         }),
         new HtmlWebpackPlugin({
             template: path.join(
-                __dirname,
+                PROJECT_ROOT,
                 'src',
                 'pages',
                 'Newtab',
@@ -236,7 +261,7 @@ const config: webpack.Configuration = {
         }),
         new HtmlWebpackPlugin({
             template: path.join(
-                __dirname,
+                PROJECT_ROOT,
                 'src',
                 'pages',
                 'Options',
@@ -248,7 +273,7 @@ const config: webpack.Configuration = {
         }),
         new HtmlWebpackPlugin({
             template: path.join(
-                __dirname,
+                PROJECT_ROOT,
                 'src',
                 'pages',
                 'Popup',
@@ -260,7 +285,7 @@ const config: webpack.Configuration = {
         }),
         new HtmlWebpackPlugin({
             template: path.join(
-                __dirname,
+                PROJECT_ROOT,
                 'src',
                 'pages',
                 'Devtools',
@@ -272,7 +297,7 @@ const config: webpack.Configuration = {
         }),
         new HtmlWebpackPlugin({
             template: path.join(
-                __dirname,
+                PROJECT_ROOT,
                 'src',
                 'pages',
                 'Panel',

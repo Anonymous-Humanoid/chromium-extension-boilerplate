@@ -1,14 +1,19 @@
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
+
+// MJS compatibility with CJS globals
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Do this as the first thing so that any code reading it knows the right env
 process.env.BABEL_ENV = 'development';
 process.env.NODE_ENV = 'development';
 
 // Env-dependent imports
-import config, { options } from './webpack.config';
 import { PORT } from './env';
+import config, { options } from './webpack.config';
 
 const notHotEntrypoints = options.notHotReload;
 const hotDependencies = [
