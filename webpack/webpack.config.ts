@@ -10,7 +10,7 @@ import ReactRefreshTypeScript from 'react-refresh-typescript';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 import packageJson from '../package.json';
-import { NODE_ENV } from './env';
+import { NODE_ENV, PORT } from './env';
 
 // MJS compatibility with CJS globals
 const __filename = fileURLToPath(import.meta.url);
@@ -61,6 +61,10 @@ const config: webpack.Configuration = {
               ]
           },
     entry: {
+        // Should fix #8
+        hmr: `webpack-dev-server/client?http://localhost:${PORT}`,
+        // react_hmr: 'react-hot-loader/patch',
+
         newtab: path.join(PROJECT_ROOT, 'src', 'pages', 'Newtab', 'index.tsx'),
         options: path.join(
             PROJECT_ROOT,
