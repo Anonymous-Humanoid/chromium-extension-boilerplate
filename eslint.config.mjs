@@ -6,10 +6,11 @@
 /** @typedef {import('@typescript-eslint/utils').TSESLint.FlatConfig.Config} Config */
 
 import js from '@eslint/js';
-import stylistic from '@stylistic/eslint-plugin'; // import-only
+import stylistic from '@stylistic/eslint-plugin';
 import jsonc from 'eslint-plugin-jsonc';
 import react from 'eslint-plugin-react';
 import tseslint from 'typescript-eslint';
+import { defineConfig } from 'eslint/config';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -51,32 +52,11 @@ const JSON_FILE_GLOBS = ['**/*.json'];
 const JSON_IGNORE_GLOBS = ['**/.vscode/*.json', '**/tsconfig.json'];
 const JSONC_FILE_GLOBS = ['**/*.jsonc', ...JSON_IGNORE_GLOBS];
 const JSON5_FILE_GLOBS = ['**/*.json5'];
-const ROOT_DIR = path.resolve(__dirname, '..', '..');
-
-/** @type {Config} */
-const PROJECT_CONFIG = {
-    languageOptions: {
-        parserOptions: {
-            projectService: {
-                defaultProject: path.resolve(ROOT_DIR, 'tsconfig.json'),
-                allowDefaultProject: [
-                    path.resolve(__dirname, __filename),
-                    path.resolve(
-                        ROOT_DIR,
-                        'config',
-                        'prettier',
-                        'prettier.config.mjs'
-                    )
-                ]
-            },
-            tsconfigRootDir: ROOT_DIR
-        }
-    }
-};
 
 /** @type {Config} */
 const GLOBAL_IGNORE_CONFIG = {
-    // 'ignores' without 'files' creates a global ignore config
+    // 'ignores' without 'files' creates a global ignore config,
+    // no .eslintignore file necessary
     ignores: [
         // Dependencies
         '**/node_modules/**',
@@ -124,7 +104,7 @@ const GLOBAL_IGNORE_CONFIG = {
 const DEFAULT_JS_CONFIGS = applyToFiles(
     JS_FILE_GLOBS,
     [],
-    tseslint.config([
+    defineConfig([
         js.configs.recommended,
         stylistic.configs.recommended,
         tseslint.configs.strictTypeChecked,
@@ -133,7 +113,7 @@ const DEFAULT_JS_CONFIGS = applyToFiles(
             languageOptions: {
                 parserOptions: {
                     projectService: true,
-                    tsconfigRootDir: ROOT_DIR
+                    tsconfigRootDir: __dirname
                 }
             }
         }
@@ -349,14 +329,14 @@ const EXTENSION_CONFIG = {
     files: JS_FILE_GLOBS,
     languageOptions: {
         globals: {
-            chrome: 'readonly'
+            chrome: 'readonly',
+            browser: 'readonly'
         }
     }
 };
 
 /** @type {Config[]} */
 const CONFIG = [
-    PROJECT_CONFIG,
     GLOBAL_IGNORE_CONFIG,
     ...JS_CONFIGS,
     ...JSON_CONFIGS,
