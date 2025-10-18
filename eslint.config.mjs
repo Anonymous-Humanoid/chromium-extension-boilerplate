@@ -6,12 +6,13 @@
 /** @typedef {import('@typescript-eslint/utils').TSESLint.FlatConfig.Config} Config */
 
 import js from '@eslint/js';
-import stylistic from '@stylistic/eslint-plugin'; // import-only
+import stylistic from '@stylistic/eslint-plugin';
 import jsonc from 'eslint-plugin-jsonc';
 import react from 'eslint-plugin-react';
-import tseslint from 'typescript-eslint';
+import { defineConfig, globalIgnores } from 'eslint/config';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import tseslint from 'typescript-eslint';
 
 // MJS compatibility with CJS globals
 const __filename = fileURLToPath(import.meta.url);
@@ -61,12 +62,7 @@ const PROJECT_CONFIG = {
                 defaultProject: path.resolve(ROOT_DIR, 'tsconfig.json'),
                 allowDefaultProject: [
                     path.resolve(__dirname, __filename),
-                    path.resolve(
-                        ROOT_DIR,
-                        'config',
-                        'prettier',
-                        'prettier.config.mjs'
-                    )
+                    path.resolve(ROOT_DIR, 'prettier.config.mjs')
                 ]
             },
             tsconfigRootDir: ROOT_DIR
@@ -75,56 +71,49 @@ const PROJECT_CONFIG = {
 };
 
 /** @type {Config} */
-const GLOBAL_IGNORE_CONFIG = {
-    // 'ignores' without 'files' creates a global ignore config
-    ignores: [
-        // Dependencies
-        '**/node_modules/**',
+const GLOBAL_IGNORE_CONFIG = globalIgnores([
+    // Development
+    '**/coverage/**',
+    '**/test/**',
+    '**/testing/**',
+    '**/package-lock.json',
+    '**/eslint.*',
 
-        // Development
-        '**/coverage/**',
-        '**/test/**',
-        '**/testing/**',
-        '**/package-lock.json',
-        '**/eslint.*',
+    // Deployment
+    '**/build/**',
+    '**/dist/**',
+    '/zip/**',
+    '**/*.min.*',
+    '**/*.bundle.*',
+    '**/*.map.js',
 
-        // Deployment
-        '**/build/**',
-        '**/dist/**',
-        '/zip/**',
-        '**/*.min.*',
-        '**/*.bundle.*',
-        '**/*.map.js',
+    // Secrets
+    '**/.DS_Store',
+    '**/*.env',
+    '**/*.env.*',
+    '**/.history',
 
-        // Secrets
-        '**/.DS_Store',
-        '**/*.env',
-        '**/*.env.*',
-        '**/.history',
+    // Temporary files
+    '**/tmp/**',
+    '**/temp/**',
+    '**/backup/**',
+    '**/cache/**',
+    '**/logs/**',
+    '**/*.log',
 
-        // Temporary files
-        '**/tmp/**',
-        '**/temp/**',
-        '**/backup/**',
-        '**/cache/**',
-        '**/logs/**',
-        '**/*.log',
-
-        // Licenses
-        '**/LICENSE',
-        '**/LICENSE.md',
-        '**/*.license'
-    ]
-};
+    // Licenses
+    '**/LICENSE',
+    '**/LICENSE.md',
+    '**/*.license'
+]);
 
 /**
  * @link https://typescript-eslint.io/users/configs/
- * @see https://typescript-eslint.io/packages/typescript-eslint#config tseslint.config
  */
 const DEFAULT_JS_CONFIGS = applyToFiles(
     JS_FILE_GLOBS,
     [],
-    tseslint.config([
+    defineConfig([
         js.configs.recommended,
         stylistic.configs.recommended,
         tseslint.configs.strictTypeChecked,
@@ -180,6 +169,7 @@ const JSON_CONFIGS = [
     }
 ];
 
+/** @type {Config} */
 const DEFAULT_REACT_CONFIG = {
     ...react.configs.flat.recommended,
     settings: {
@@ -349,7 +339,8 @@ const EXTENSION_CONFIG = {
     files: JS_FILE_GLOBS,
     languageOptions: {
         globals: {
-            chrome: 'readonly'
+            chrome: 'readonly',
+            browser: 'readonly'
         }
     }
 };
