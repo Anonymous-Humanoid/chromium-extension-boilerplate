@@ -14,7 +14,7 @@
         "build": "tsx ./webpack/build.ts",
         "start": "tsx ./webpack/webserver.ts",
         "lint": "eslint --config ./eslint.config.mjs .",
-        "prettify": "prettier-eslint --eslint-config-path ./eslint.config.mjs --config ./prettier.config.mjs --no-include-dot-files --write **/*.{yml,yaml,js,cjs,mjs,ts,cts,mts,jsx,tsx,md,html,css,json,jsonc,json5}"
+        "prettify": "prettier-eslint --eslint-config-path ./eslint.config.mjs --config ./prettier.config.mjs --ignore-path ./prettierignore --write **/*.{yml,yaml,js,cjs,mjs,ts,cts,mts,jsx,tsx,md,html,css,json,jsonc,json5}"
     },
     "dependencies": {
         "react": "^19.0.0",
