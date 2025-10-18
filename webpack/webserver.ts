@@ -7,8 +7,7 @@ import WebpackDevServer from 'webpack-dev-server';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Do this as the first thing so that any code reading it knows the right env
-process.env.BABEL_ENV = 'development';
+// Setting env
 process.env.NODE_ENV = 'development';
 
 // Env-dependent imports

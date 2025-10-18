@@ -9,6 +9,5 @@
     instead of `-c` to dynamically resolve the config file. See more at:
     [feature flags](https://eslint.org/docs/latest/flags#flag-prefixes)
 - Add ESLint/Prettier Git CI integration
-- Remove unused Babel dependencies
 - Configure .hintrc
 - Add tests with Playwright for Node.js

@@ -159,17 +159,6 @@ const config: webpack.Configuration = {
                 use: [
                     {
                         loader: 'source-map-loader'
-                    },
-                    {
-                        loader: require.resolve('babel-loader'),
-                        options: {
-                            plugins: [
-                                // prettier-ignore
-                                // (Line wrapping conflicts with ESLint)
-                                IS_DEV_MODE
-                                && require.resolve('react-refresh/babel')
-                            ].filter(Boolean)
-                        }
                     }
                 ],
                 exclude: /node_modules/
