@@ -199,5 +199,5 @@ CallAPI({ key: KEY });
 
 See the [TODOs](./TODO.md)
 
-[license-image]: https://img.shields.io/npm/l/markdownlint.svg
+[license-image]: https://img.shields.io/github/license/Anonymous-Humanoid/chromium-extension-boilerplate
 [license-url]: ./LICENSE.md
