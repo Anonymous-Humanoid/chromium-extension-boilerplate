@@ -1,5 +1,3 @@
-import { Application } from 'express';
-import { Server } from 'node:tls';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import webpack from 'webpack';
@@ -46,7 +44,7 @@ for (const entryName in config.entry) {
 }
 
 const compiler = webpack(config);
-const server = new WebpackDevServer<Application, Server>(
+const server = new WebpackDevServer(
     {
         hot: true,
         liveReload: false,
